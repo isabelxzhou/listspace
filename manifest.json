@@ -1,6 +1,6 @@
 {
-  "name": "listspace",
-  "short_name": "ls",
+  "name": "Listspace",
+  "short_name": "Listspace",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#0f172a",
