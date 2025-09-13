@@ -75,6 +75,7 @@
             font-family: 'Open Sans', sans-serif;
             position: relative;
             text-align: left; /* Keep text input left-aligned */
+            font-size: 14px; /* Match font size with tasks */
         }
 
         .plus-sign {
@@ -126,15 +127,21 @@
         }
         input[type="checkbox"] {
             appearance: none;
-            width: 20px;
-            height: 20px;
+            width: 15px; /* Smaller size */
+            height: 15px; /* Smaller size */
             background: rgba(255, 255, 255, 0.2);
             border-radius: 3px;
-            margin-right: 10px;
+            margin-right: 5px; /* Smaller margin */
         }
         .task-text {
             flex-grow: 1;
             margin-left: 10px;
+        }
+
+        @media (pointer: coarse) {
+            li {
+                touch-action: none;
+            }
         }
     </style>
     <script>
@@ -213,6 +220,10 @@
                     }
                 }, { offset: Number.NEGATIVE_INFINITY }).element;
             }
+
+            taskList.addEventListener('dragstart', function(e) {
+                e.dataTransfer.setDragImage(e.target, 0, 0);
+            });
         });
     </script>
     <link rel="manifest" href="/manifest.json">
