@@ -61,7 +61,7 @@
         }
         input[type="text"] {
             width: 300px;
-            padding: 10px; /* Adjust padding */
+            padding: 15px; /* Add more padding for easier tap */
             margin-bottom: 10px;
             border: none;
             border-radius: 16px;
@@ -74,8 +74,9 @@
             box-sizing: border-box;
             font-family: 'Open Sans', sans-serif;
             position: relative;
-            text-align: left; /* Keep text input left-aligned */
-            font-size: 14px; /* Match font size with tasks */
+            text-align: left;
+            font-size: 14px;
+            inputmode: text; /* Improve keyboard experience */
         }
 
         .plus-sign {
@@ -106,6 +107,22 @@
             font-family: 'Open Sans', sans-serif;
         }
 
+        input[type="checkbox"] {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+            margin-right: 5px; /* Smaller margin */
+        }
+
+        /* Responsive styles */
+        @media (pointer: coarse) {
+            li {
+                touch-action: none;
+            }
+        }
+
         li {
             background: rgba(255, 255, 255, 0.15);
             margin-bottom: 10px;
@@ -123,26 +140,11 @@
             width: 300px;
             box-sizing: border-box;
             font-family: 'Open Sans', sans-serif;
-            font-size: 14px; /* Smaller font size for tasks */
-        }
-        input[type="checkbox"] {
-            appearance: none;
-            width: 15px; /* Smaller size */
-            height: 15px; /* Smaller size */
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 3px;
-            margin-right: 5px; /* Smaller margin */
+            font-size: 14px;
         }
         .task-text {
             flex-grow: 1;
             margin-left: 10px;
-        }
-
-        @media (pointer: coarse) {
-            li {
-                touch-action: none;
-                -webkit-user-drag: element;
-            }
         }
     </style>
     <script>
@@ -184,30 +186,20 @@
                         text.className = 'task-text';
                         text.textContent = taskText;
                         li.appendChild(text);
-                        taskList.appendChild(li); // Append new task to the end of the list
+                        taskList.appendChild(li);
                         taskInput.value = '';
 
-                        li.addEventListener('dragstart', function(e) {
-                            e.dataTransfer.setData('text/plain', li.textContent);
-                            li.classList.add('dragging');
+                        taskList.addEventListener('dragstart', function(e) {
+                            e.dataTransfer.effectAllowed = 'move';
+                            e.dataTransfer.setData('text/plain', e.target.textContent);
+                            e.target.classList.add('dragging');
+                            e.dataTransfer.setDragImage(e.target, 0, 0); // Use actual element as drag image
                         });
-                        li.addEventListener('dragend', function() {
+                        taskList.addEventListener('dragend', function() {
                             li.classList.remove('dragging');
                         });
                     }
                 }
-            });
-
-            taskList.addEventListener('dragstart', function(e) {
-                e.dataTransfer.effectAllowed = 'move';
-                e.dataTransfer.setData('text/plain', e.target.textContent);
-                e.target.classList.add('dragging');
-                const emptyImage = new Image();
-                e.dataTransfer.setDragImage(emptyImage, 0, 0); // Use empty image to remove default icon
-            });
-
-            taskList.addEventListener('dragend', function(e) {
-                e.target.classList.remove('dragging');
             });
 
             taskList.addEventListener('dragover', function(e) {
@@ -234,15 +226,39 @@
                 }, { offset: Number.NEGATIVE_INFINITY }).element;
             }
 
-            taskList.addEventListener('dragstart', function(e) {
-                e.dataTransfer.setDragImage(new Image(), 0, 0); // Remove default drag image
-            });
-
+            // Mobile touch events
             taskList.addEventListener('touchstart', function(e) {
                 const touch = e.touches[0];
                 const target = document.elementFromPoint(touch.clientX, touch.clientY);
                 if (target && target.tagName === 'LI') {
                     const dragEvent = new DragEvent('dragstart', {
+                        bubbles: true,
+                        cancelable: true,
+                        dataTransfer: new DataTransfer()
+                    });
+                    target.dispatchEvent(dragEvent);
+                }
+            });
+
+            taskList.addEventListener('touchmove', function(e) {
+                e.preventDefault();
+                const touch = e.touches[0];
+                const target = document.elementFromPoint(touch.clientX, touch.clientY);
+                if (target && target.tagName === 'LI') {
+                    const dragEvent = new DragEvent('dragover', {
+                        bubbles: true,
+                        cancelable: true,
+                        dataTransfer: new DataTransfer()
+                    });
+                    target.dispatchEvent(dragEvent);
+                }
+            });
+
+            taskList.addEventListener('touchend', function(e) {
+                const touch = e.changedTouches[0];
+                const target = document.elementFromPoint(touch.clientX, touch.clientY);
+                if (target && target.tagName === 'LI') {
+                    const dragEvent = new DragEvent('drop', {
                         bubbles: true,
                         cancelable: true,
                         dataTransfer: new DataTransfer()
