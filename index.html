@@ -33,7 +33,7 @@
             border-radius: 50%;
         }
         .blinking-star {
-            animation: twinkle 2s infinite ease-in-out alternate;
+            animation: twinkle 1.5s infinite ease-in-out alternate;
         }
         .shooting-star {
             width: 2px;
@@ -56,7 +56,7 @@
         }
 
         @keyframes twinkle {
-            from { opacity: 0; }
+            from { opacity: 0.3; }
             to { opacity: 1; }
         }
         input[type="text"] {
@@ -159,9 +159,12 @@
             for (let i = 0; i < 500; i++) {
                 const star = document.createElement('div');
                 star.className = 'star';
-                if (Math.random() > 0.9) {
+                const size = Math.random() > 0.7 ? 2 : 1; // 30% of stars will be slightly bigger
+                star.style.width = `${size}px`;
+                star.style.height = `${size}px`;
+                if (Math.random() > 0.5) { // 50% of stars will blink
                     star.classList.add('blinking-star');
-                    star.style.animationDelay = Math.random() * 5 + 's';
+                    star.style.animationDelay = Math.random() * 3 + 's';
                 }
                 star.style.top = Math.random() * 100 + 'vh';
                 star.style.left = Math.random() * 100 + 'vw';
